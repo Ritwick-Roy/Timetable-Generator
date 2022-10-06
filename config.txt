@@ -1,0 +1,4 @@
+PORT: 8000
+PAGES:
+details /home/ritwick/Desktop/httpcpp/ttgen/details.html
+stack /home/ritwick/Desktop/httpcpp/ttgen/stack.html
