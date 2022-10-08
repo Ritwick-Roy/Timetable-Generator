@@ -4,18 +4,19 @@ using namespace std;
 #define pb push_back
 #define all(a) a.begin(), a.end()
 #define tr(c, it) for (typeof(c.begin()) it = c.begin(); it != c.end(); it++)
-#define present(c, i) (c.ssd(i) != c.end())
-#define cpresent(c, i) (ssd(all(c), i) != c.end())
+#define present(c, i) (c.find(i) != c.end())
+#define cpresent(c, i) (find(all(c), i) != c.end())
 #define LECTSIZE 1
 #define LABSIZE 2
 #define TUTSIZE 2
 
-string input="";
+string input,finalTT;
 stringstream ss;
 // make 2 graphs 
 // firstly it is periods and secondly is all period numbers for bans/allowed period nos.
 
 fstream fin("input.txt",ios::in|ios::out);
+
 
 class Period
 {
@@ -23,11 +24,13 @@ public:
     ll id, length;
     string Room, Prof;
     vector<string> Group;
+    vector<bool> Bans;
     Period()
     {
         id = -1;
-        length = 1; // represents how many colors to assign an edge
+        length = 1; // represents how many colors to assign a vertex
         Room = Prof = "none";
+        // Bans.resize(maxColor);
     }
 };
 
@@ -43,14 +46,16 @@ public:
     }
 };
 
+// colorLimit is max times a period can be assigned
 ll vertices, subjectCount, number = -1, maxColor = 100, maxAllowedClasses = 2, beforeBreak, afterBreak, days, Lects = 0, Labs = 0, Tuts = 0;
 vector<vector<ll>> mat;
+vector<vector<bool>> allowed;
 vector<Subject> subjects;
 map<ll, Period> m;
-map<ll, ll> p;
-bool **allowed;
+map<ll, ll> p;  // give a number to part of a longer period
 vector<ll> colors(maxColor, -1), colorLimit(maxColor, maxAllowedClasses);
 
+// print the adjency matrix of graph
 void display(vector<vector<ll>> &adj)
 {
     ll i, j;
@@ -63,6 +68,7 @@ void display(vector<vector<ll>> &adj)
     }
 }
 
+// check wether 2 periods having their groups, have some groups in common or not
 bool groupCheck(vector<string> &a, vector<string> &b)
 {
     ll i, j;
@@ -73,6 +79,8 @@ bool groupCheck(vector<string> &a, vector<string> &b)
     return false;
 }
 
+// map the ids (numbers from 1 to max periods) to the corr. period
+// map a period to its part number
 void makeIds()
 {
     ll i, j, k;
@@ -82,7 +90,7 @@ void makeIds()
         {
             for (k = 0; k < LECTSIZE; k++)
             {
-                cout << subjects[i].Lecture[LECTSIZE * j + k].id << " ";
+                // cout << subjects[i].Lecture[LECTSIZE * j + k].id << " ";
                 m[subjects[i].Lecture[LECTSIZE * j + k].id] = subjects[i].Lecture[LECTSIZE * j + k];
                 p[subjects[i].Lecture[LECTSIZE * j + k].id]=k;
             }
@@ -91,7 +99,7 @@ void makeIds()
         {
             for (k = 0; k < LABSIZE; k++)
             {
-                cout << subjects[i].Lab[LABSIZE * j + k].id << " ";
+                // cout << subjects[i].Lab[LABSIZE * j + k].id << " ";
                 m[subjects[i].Lab[LABSIZE * j + k].id] = subjects[i].Lab[LABSIZE * j + k];
                 p[subjects[i].Lab[LABSIZE * j + k].id]=k;
             }
@@ -100,15 +108,16 @@ void makeIds()
         {
             for (k = 0; k < TUTSIZE; k++)
             {
-                cout << subjects[i].Tut[TUTSIZE * j + k].id << " ";
+                // cout << subjects[i].Tut[TUTSIZE * j + k].id << " ";
                 m[subjects[i].Tut[TUTSIZE * j + k].id] = subjects[i].Tut[TUTSIZE * j + k];
                 p[subjects[i].Tut[TUTSIZE * j + k].id]=k;
             }
         }
-        cout << "\n";
+        // cout << "\n";
     }
 }
 
+// can vertex vertex be assigned the color c
 bool isSafe(ll vertex, ll c)
 {
     ll i;
@@ -120,12 +129,12 @@ bool isSafe(ll vertex, ll c)
     return true;
 }
 
+// allowed is essentially the second graph
+// set legal periods to be true for all days (acc. to length)
 void updateAllowed()
 {
     ll i, j, n, k, jump = (beforeBreak + afterBreak);
-    allowed = new bool *[vertices];
-    for (i = 0; i < vertices; i++)
-        allowed[i] = new bool[maxColor];
+    allowed.resize(vertices,vector<bool>(maxColor,false));
     for (i = 0; i < vertices; i++)
     {
         for (j = 0; j < maxColor; j++)
@@ -155,6 +164,7 @@ void updateAllowed()
     //         cout << allowed[i][j] << " ";
     //     cout << "end\n";
     // }
+
     // for (k = 0; k < vertices; k++)
     // {
     //     cout << "Enter number of bans for " << k << ": ";
@@ -169,11 +179,12 @@ void updateAllowed()
     // }
 }
 
+// if room, prof, or student groups are same, then make an edge
 void makeGraph()
 {
     ll i, j, n;
-    vertices = number + 1;
-    mat.resize(vertices); // nodes==number, +1 for 0 indexing
+    vertices = number+1; // was initially set to the next line
+    mat.resize(vertices); // nodes==number, because number is 0 indexed
     for (i = 0; i < vertices; i++)
     {
         // m[i] gives us ith period as Period, so we have duration factor;
@@ -198,7 +209,7 @@ void display(vector<ll> &col)
 
 bool graphColoring(ll vertex)
 {
-    if (vertex >= vertices - 1)
+    if (vertex >= vertices  )
         return true;
     ll i, j, n;
     for (i = 0; i < maxColor; i++)
@@ -225,45 +236,74 @@ bool graphColoring(ll vertex)
 void printTimeTable()
 {
     ll i,j;
-    map<ll,ll> tt;
+    map<ll,vector<ll> > mapTT;
     for(i=0;i<vertices;i++)
     {
-        tt[colors[i]]=i;   //colors[i] gives color of ith node, tt[i] give node of color[i]
+        mapTT[colors[i]].push_back(i);   //colors[i] gives color of ith node, tt[i] give node of color[i]
+    }
+    for(i=0;i<maxColor;i++)
+    {
+        if(mapTT.find(i)==mapTT.end())
+        mapTT[i]={-1};
     }
     for(i=0;i<days;i++)
     {
         for(j=0;j<(beforeBreak+afterBreak);j++)
-            cout<<setw(3)<<tt[(beforeBreak+afterBreak)*i+j]+1<<" ";
+            {
+                for(auto x:mapTT[(beforeBreak+afterBreak)*i+j])
+                cout<<x+1<<",";
+                cout<<" ";
+            }
         cout<<"\n";
     }
 }
 
+void makeTT()
+{
+    for(auto x:colors)
+    finalTT+=to_string(x)+" ";
+}
+
+void setupTT()
+{
+    number = -1;
+    Lects=Labs=Tuts=0;
+    maxColor = 100;
+    finalTT="";
+    mat.resize(0);
+    allowed.resize(0);
+    subjects.clear();
+    colors.resize(0);
+    colorLimit.resize(0);
+    m.clear();
+    p.clear();
+}
+
 void solve()
 {
-    getline(fin,input);
-    cout<<input<<"\n";
+    setupTT();
     ss=stringstream(input);
     ll i, groupCount, temp, maxLectCount = -1, maxTutCount = -1, maxLabCount = -1, k, j, size;
     string s1, s2, s3;
-    cout << "Number of days college is open: ";
+    // cout << "Number of days college is open: ";
     ss >> days;
-    cout << "Number of periods before break: ";
+    // cout << "Number of periods before break: ";
     ss >> beforeBreak;
-    cout << "Number of periods after break: ";
+    // cout << "Number of periods after break: ";
     ss >> afterBreak;
     maxColor = (beforeBreak + afterBreak) * days;
-    colors.resize(maxColor);
-    colorLimit.resize(maxColor);
+    colors.resize(maxColor,-1);
+    colorLimit.resize(maxColor,maxAllowedClasses);
 
-    cout << "Enter number of subjects: ";
+    // cout << "Enter number of subjects: ";
     ss >> subjectCount;
     subjects.resize(subjectCount);
     for (i = 0; i < subjectCount; i++)
     {
-        cout << "Enter " << i << " subject name:";
+        // cout << "Enter " << i << " subject name:";
         ss >> subjects[i].name;
 
-        cout << "Number of lectures:";
+        // cout << "Number of lectures:";
         ss >> subjects[i].lectCount;
         Lects += subjects[i].lectCount;
         maxLectCount = max(maxLectCount, subjects[i].lectCount);
@@ -271,9 +311,9 @@ void solve()
         {
             size = LECTSIZE;
             subjects[i].Lecture.resize(size * subjects[i].lectCount); // basically initialised lectcount number of periods for lectures
-            cout << "Enter lecturer name: ";
+            // cout << "Enter lecturer name: ";
             ss >> s1;
-            cout << "Enter number of groups attending: ";
+            // cout << "Enter number of groups attending: ";
             ss >> groupCount;
             vector<string> tempGroup;
             while (groupCount--)
@@ -281,7 +321,7 @@ void solve()
                 ss >> s2;
                 tempGroup.pb(s2);
             }
-            cout << "Enter room: ";
+            // cout << "Enter room: ";
             ss >> s3;
             for (k = 0; k < LECTSIZE; k++)
             {
@@ -293,7 +333,7 @@ void solve()
                 }
             }
         }
-        cout << "Number of tutorials:";
+        // cout << "Number of tutorials:";
         ss >> subjects[i].tutCount;
         Tuts += subjects[i].tutCount;
         maxTutCount = max(maxTutCount, subjects[i].tutCount);
@@ -304,9 +344,9 @@ void solve()
             subjects[i].Tut.resize(size * subjects[i].tutCount); // basically 2*tuts periods
             for (j = 0; j < subjects[i].tutCount; j++)
             {
-                cout << "Enter tutorial-coordinator name: ";
+                // cout << "Enter tutorial-coordinator name: ";
                 ss >> s1;
-                cout << "Enter number of groups attending: ";
+                // cout << "Enter number of groups attending: ";
                 ss >> groupCount;
                 vector<string> tempGroup;
                 while (groupCount--)
@@ -314,7 +354,7 @@ void solve()
                     ss >> s2;
                     tempGroup.pb(s2);
                 }
-                cout << "Enter room: ";
+                // cout << "Enter room: ";
                 ss >> s3;
                 for (k = 0; k < size; k++)
                 {
@@ -325,7 +365,7 @@ void solve()
                 }
             }
         }
-        cout << "Number of labs:";
+        // cout << "Number of labs:";
         ss >> subjects[i].labCount;
         maxLabCount = max(maxLabCount, subjects[i].labCount);
         Labs += subjects[i].labCount;
@@ -335,9 +375,9 @@ void solve()
             subjects[i].Lab.resize(size * subjects[i].labCount); // basically 2*tuts periods
             for (j = 0; j < subjects[i].labCount; j++)
             {
-                cout << "Enter tutorial-coordinator name: ";
+                // cout << "Enter tutorial-coordinator name: ";
                 ss >> s1;
-                cout << "Enter number of groups attending: ";
+                // cout << "Enter number of groups attending: ";
                 ss >> groupCount;
                 vector<string> tempGroup;
                 while (groupCount--)
@@ -345,7 +385,7 @@ void solve()
                     ss >> s2;
                     tempGroup.pb(s2);
                 }
-                cout << "Enter room: ";
+                // cout << "Enter room: ";
                 ss >> s3;
                 for (k = 0; k < size; k++)
                 {
@@ -398,18 +438,20 @@ void solve()
     // for(i=0;i<vertices;i++)
     // cout<<i<<" "<<p[i]<<"\n";
 
+
     // for(i=0;i<vertices;i++)   //print graph
     //     for(j=0;j<mat[i].size();j++)
     //         if(i<mat[i][j])
     //         cout<<i<<" "<<mat[i][j]<<"\n";
 
     updateAllowed();
+    cout<<"update\n";
     if (graphColoring(0))
-        display(colors);
+        // display(colors);
     // display(mat);
-
     printTimeTable();
-
+    cout<<"printing\n";
+    makeTT();
 }
 
 // int main()
@@ -419,3 +461,19 @@ void solve()
 //     solve();
 //     return 0;
 // }
+
+//input format
+//days,beforebreak,afterbreak
+// subjectcount
+//   for each subject
+//   subjectname
+//   lectcount
+//     for each lectcount
+//     lecturer, groupcount, 
+//       for each groupcount
+//       groupname
+//     room
+//   similarly tut and lab
+
+// does order of backtracking matter? i dont think so, hence not doing it on basis of vertex degree
+// its not true order does matter and im a retard i need to color on basis of indegree

@@ -157,16 +157,19 @@ int main(void)
         if(method=="POST")
         {
             i=buf.find("input");
+            input="";
             for(i=i+8;buf[i]!='"';++i)
             input+=buf[i];
-            cout<<"mil gaya\n"<<input<<"\n";
+            cout<<"yele\n"<<input<<"\n";
             solve();
-            httpHeader="HTTP/1.1 200 OK\r\n\n{\"message\":\"le timetable\"}";
+            httpHeader="HTTP/1.1 200 OK\r\n\n{\"message\":\""+finalTT+"\"}";
+            // httpHeader="HTTP/1.1 200 OK\r\n\n{\"message\":\"hey\"}";
             char str[httpHeader.size()];
             for(i=0;i<httpHeader.size();++i)
             str[i]=httpHeader[i];
             str[i]='\0';
             send(clientSocket, str, sizeof(str), 0);
+            cout<<"reached\n";
         }
         close(clientSocket);
     }
