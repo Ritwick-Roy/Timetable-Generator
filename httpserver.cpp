@@ -160,16 +160,14 @@ int main(void)
             input="";
             for(i=i+8;buf[i]!='"';++i)
             input+=buf[i];
-            cout<<"yele\n"<<input<<"\n";
             solve();
-            httpHeader="HTTP/1.1 200 OK\r\n\n{\"message\":\""+finalTT+"\"}";
-            // httpHeader="HTTP/1.1 200 OK\r\n\n{\"message\":\"hey\"}";
+            httpHeader="HTTP/1.1 200 OK\r\n\n{\n"+finalTT+"\n}";
             char str[httpHeader.size()];
             for(i=0;i<httpHeader.size();++i)
             str[i]=httpHeader[i];
             str[i]='\0';
+            cout<<"SENT:\n"<<str<<"\n";
             send(clientSocket, str, sizeof(str), 0);
-            cout<<"reached\n";
         }
         close(clientSocket);
     }

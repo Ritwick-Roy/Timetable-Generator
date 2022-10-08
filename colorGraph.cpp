@@ -18,19 +18,20 @@ stringstream ss;
 fstream fin("input.txt",ios::in|ios::out);
 
 
+// colorLimit is max times a period can be assigned
+ll vertices, subjectCount, number = -1, maxColor = 100, maxAllowedClasses = 2, beforeBreak, afterBreak, days, Lects = 0, Labs = 0, Tuts = 0;
+
 class Period
 {
 public:
     ll id, length;
-    string Room, Prof;
+    string subjectName, Room, Prof, Bans;
     vector<string> Group;
-    vector<bool> Bans;
     Period()
     {
         id = -1;
         length = 1; // represents how many colors to assign a vertex
-        Room = Prof = "none";
-        // Bans.resize(maxColor);
+        Room = Prof = Bans = "none";
     }
 };
 
@@ -46,8 +47,6 @@ public:
     }
 };
 
-// colorLimit is max times a period can be assigned
-ll vertices, subjectCount, number = -1, maxColor = 100, maxAllowedClasses = 2, beforeBreak, afterBreak, days, Lects = 0, Labs = 0, Tuts = 0;
 vector<vector<ll>> mat;
 vector<vector<bool>> allowed;
 vector<Subject> subjects;
@@ -113,7 +112,7 @@ void makeIds()
                 p[subjects[i].Tut[TUTSIZE * j + k].id]=k;
             }
         }
-        // cout << "\n";
+        cout << "\n";
     }
 }
 
@@ -142,41 +141,36 @@ void updateAllowed()
     }
     for (i = 0; i < vertices; i++)
     {
-        vector<ll> legal;
-        for (j = 0; j + m[i].length - 1 < beforeBreak; j += m[i].length)
+        if(m[i].Bans=="none")
         {
-            for (k = 0; k < days; k++)
-                legal.pb(j + k * jump);
+            vector<ll> legal;
+            for (j = 0; j + m[i].length - 1 < beforeBreak; j += m[i].length)
+            {
+                for (k = 0; k < days; k++)
+                    legal.pb(j + k * jump);
+            }
+            for (j = beforeBreak; j + m[i].length - 1 < beforeBreak + afterBreak; j += m[i].length)
+            {
+                for (k = 0; k < days; k++)
+                    legal.pb(j + k * jump);
+            }
+            for (auto x : legal)
+            {
+                allowed[i][x] = true;
+            }
         }
-        for (j = beforeBreak; j + m[i].length - 1 < beforeBreak + afterBreak; j += m[i].length)
+        else
         {
-            for (k = 0; k < days; k++)
-                legal.pb(j + k * jump);
-        }
-        for (auto x : legal)
-        {
-            allowed[i][x] = true;
+            for(j=0;j<m[i].Bans.size();j++)
+            {
+                // its allowed and if its banned then ban it
+                // if(allowed[i][j] && m[i].Bans[j]=='0')
+                // allowed[i][j]=false;
+                // or just set it according to user
+                allowed[i][j]=m[i].Bans[j]=='1';
+            }
         }
     }
-    // for (i = 0; i < vertices; i++)
-    // {
-    //     for (j = 0; j < maxColor; j++)
-    //         cout << allowed[i][j] << " ";
-    //     cout << "end\n";
-    // }
-
-    // for (k = 0; k < vertices; k++)
-    // {
-    //     cout << "Enter number of bans for " << k << ": ";
-    //     ss >> n;
-    //     cout << "Enter bans: ";
-    //     while (n--)
-    //     {
-    //         ss >> j;
-    //         allowed[k][j] = false;
-    //         cout << "banning " << k << " " << j << "\n";
-    //     }
-    // }
 }
 
 // if room, prof, or student groups are same, then make an edge
@@ -258,10 +252,27 @@ void printTimeTable()
     }
 }
 
+string mergeGroups(vector<string> &a)
+{
+    string result="";
+    for(auto x:a)
+    result+=x+" ";
+    return result;
+}
+
 void makeTT()
 {
-    for(auto x:colors)
-    finalTT+=to_string(x)+" ";
+    finalTT="";
+    map<ll,string> schedule;
+    int i;
+    for(i=0;i<vertices;i++)
+    if(schedule.find(colors[i])==schedule.end())
+    schedule[colors[i]]=m[i].subjectName+"|"+m[i].Room+"|"+m[i].Prof+"|"+mergeGroups(m[i].Group);
+    else
+    schedule[colors[i]]+="+"+m[i].subjectName+"|"+m[i].Room+"|"+m[i].Prof+"|"+mergeGroups(m[i].Group);
+    for(i=0;i<schedule.size()-1;++i)
+    finalTT+="\""+to_string(i)+"\":\""+schedule[i]+"\",\n";
+    finalTT+="\""+to_string(i)+"\":\""+schedule[i]+"\"\n";
 }
 
 void setupTT()
@@ -269,7 +280,7 @@ void setupTT()
     number = -1;
     Lects=Labs=Tuts=0;
     maxColor = 100;
-    finalTT="";
+    finalTT="Invalid Input";
     mat.resize(0);
     allowed.resize(0);
     subjects.clear();
@@ -284,7 +295,7 @@ void solve()
     setupTT();
     ss=stringstream(input);
     ll i, groupCount, temp, maxLectCount = -1, maxTutCount = -1, maxLabCount = -1, k, j, size;
-    string s1, s2, s3;
+    string s1, s2, s3, s4;
     // cout << "Number of days college is open: ";
     ss >> days;
     // cout << "Number of periods before break: ";
@@ -294,6 +305,7 @@ void solve()
     maxColor = (beforeBreak + afterBreak) * days;
     colors.resize(maxColor,-1);
     colorLimit.resize(maxColor,maxAllowedClasses);
+    // allowed.resize(maxColor,vector<bool>(maxColor,false));
 
     // cout << "Enter number of subjects: ";
     ss >> subjectCount;
@@ -323,6 +335,8 @@ void solve()
             }
             // cout << "Enter room: ";
             ss >> s3;
+            // cout << "Enter bans: ";
+            ss >> s4;
             for (k = 0; k < LECTSIZE; k++)
             {
                 for (j = 0; j < subjects[i].lectCount; j++)
@@ -330,6 +344,8 @@ void solve()
                     subjects[i].Lecture[LECTSIZE * j + k].Room = s3;
                     subjects[i].Lecture[LECTSIZE * j + k].Group = tempGroup;
                     subjects[i].Lecture[LECTSIZE * j + k].Prof = s1;
+                    subjects[i].Lecture[LECTSIZE * j + k].Bans = s4;
+                    subjects[i].Lecture[LECTSIZE * j + k].subjectName = subjects[i].name+"-L";
                 }
             }
         }
@@ -356,12 +372,16 @@ void solve()
                 }
                 // cout << "Enter room: ";
                 ss >> s3;
+                // cout << "Enter bans: ";
+                ss >> s4;
                 for (k = 0; k < size; k++)
                 {
                     subjects[i].Tut[size * j + k].Room = s3;
                     subjects[i].Tut[size * j + k].Group = tempGroup;
                     subjects[i].Tut[size * j + k].Prof = s1;
                     subjects[i].Tut[size * j + k].length = size;
+                    subjects[i].Tut[size * j + k].Bans = s4;
+                    subjects[i].Tut[size * j + k].subjectName = subjects[i].name+"-T";
                 }
             }
         }
@@ -387,12 +407,16 @@ void solve()
                 }
                 // cout << "Enter room: ";
                 ss >> s3;
+                // cout << "Enter bans: ";
+                ss >> s4;
                 for (k = 0; k < size; k++)
                 {
                     subjects[i].Lab[size * j + k].Room = s3;
                     subjects[i].Lab[size * j + k].Group = tempGroup;
                     subjects[i].Lab[size * j + k].Prof = s1;
                     subjects[i].Lab[size * j + k].length = size;
+                    subjects[i].Lab[size * j + k].Bans = s4;
+                    subjects[i].Lab[size * j + k].subjectName = subjects[i].name+"-Lab";
                 }
             }
         }
@@ -425,32 +449,27 @@ void solve()
                 continue;
             }
             for (j = 0; j < LECTSIZE; j++)
+            {
                 subjects[i].Lecture[LECTSIZE * (k - 1) + j].id = ++number;
+            }
         }
     }
 
-    cout << "\n";
+    // cout << "\n";
     // ids of all
     makeIds();
     makeGraph();
+    
 
     // cout<<"part numbers:\n";
     // for(i=0;i<vertices;i++)
     // cout<<i<<" "<<p[i]<<"\n";
-
-
-    // for(i=0;i<vertices;i++)   //print graph
-    //     for(j=0;j<mat[i].size();j++)
-    //         if(i<mat[i][j])
-    //         cout<<i<<" "<<mat[i][j]<<"\n";
+    // display(mat);
 
     updateAllowed();
-    cout<<"update\n";
     if (graphColoring(0))
         // display(colors);
-    // display(mat);
     printTimeTable();
-    cout<<"printing\n";
     makeTT();
 }
 
@@ -473,6 +492,7 @@ void solve()
 //       for each groupcount
 //       groupname
 //     room
+//     bans
 //   similarly tut and lab
 
 // does order of backtracking matter? i dont think so, hence not doing it on basis of vertex degree
