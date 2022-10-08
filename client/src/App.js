@@ -1,37 +1,24 @@
 import './App.css';
-import axios from 'axios';
-import React, { useState } from "react";
+import React from "react";
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import Form from './Form'
+import Navbar from './Navbar'
+import Home from './Home'
+import NotFound from './NotFound'
 
 function App() {
 
-  const [data, setData] = useState("");
-
-  const func = async () =>{
-    axios.post('/',{
-      'input':'5 5 4 6 NA 3 tina 4 L1 L2 M1 M2 audi none 0 4 tina 1 L1 C1 none tina 1 L2 C1 none pankaj 1 M1 C2 none pankaj 1 M2 C2 none DMS 3 vivek 4 L1 L2 M1 M2 audi none 4 vivek 1 L1 S1 none vivek 1 L2 S1 none vivek 1 M1 S1 none vivek 1 M2 S1 none 0 CAO 3 vivek 4 L1 L2 M1 M2 audi none 0 0 PC 1 vivek 4 L1 L2 M1 M2 audi none 0 4 vivek 1 L1 C2 none manisha 1 L2 C1 none deep 1 M1 C2 none jain 1 M2 C2 none DSA 3 manisha 4 L1 L2 M1 M2 audi none 0 4 manisha 1 L1 C2 none manisha 1 L2 C2 none manisha 1 M1 C1 none manisha 1 M2 C1 none OS 3 jain 4 L1 L2 M1 M2 audi none 0 4 jain 1 L1 C2 none jain 1 L2 C2 none jain 1 M1 C1 none jain 1 M2 C2 none '
-    },{
-      headers:{
-        'Content-Type':'application/json'
-      }
-    })
-    .then((res)=>{
-      // res=JSON.parse(res);
-      console.log(res.data);
-      setData(JSON.stringify(res.data));
-    })
-  }
-
   return (
-    <div className="App">
-      <button
-        onClick={() => {
-          func();
-        }}
-      >
-        GET TIMETABLE
-      </button>
-      { data }
+    <Router>
+      <div className="App">
+        <Navbar/>
+          <Routes>
+            <Route exact path="/" element={<Home/>}/>
+            <Route path="/timetable" element={<Form/>}/>
+            <Route path="*" element={<NotFound/>} />
+          </Routes>
       </div>
+    </Router>
   );
 }
 
