@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Period = require("../models/Period");
+const Subject = require("../models/Subject");
 require("dotenv").config();
 
 router.get("/", async (req, res) => {
@@ -57,10 +58,20 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const subjects = await Subject.find();
+
+    subjects.forEach( async (subject)=>{
+      subject.lectPeriods.filter((ele)=>{ele!=req.params.id});
+      subject.labPeriods.filter((ele)=>{ele!=req.params.id});
+      subject.tutPeriods.filter((ele)=>{ele!=req.params.id});
+      await Subject.findByIdAndUpdate(subject._id,subject);
+    });
+
     const period = await Period.findByIdAndDelete(req.params.id);
     if (!period) {
       return res.status(400).json({ msg: "Period not found" });
     }
+  
     res.json(period);
   } catch (error) {
     console.error(error.message);

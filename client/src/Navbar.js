@@ -30,7 +30,7 @@ const Navbar = () => {
         >
           Timetable
         </Link>
-        <Link to="/update">Update info</Link>
+        <Link to="/schedule">Create Schedule</Link>
         <Link to="/about">About</Link>
       </div>
     </nav>

@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Subject = require("../models/Subject");
+const Period = require("../models/Period");
+const Schedule = require("../models/Schedule");
 require("dotenv").config();
 
 router.get("/", async (req, res) => {
@@ -31,10 +33,12 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req,res)=>{
+router.patch("/:id", async (req, res) => {
   try {
-    const updatedSubject = req.body;
+    const { updatedSubject } = req.body;
+    console.log(updatedSubject);
     const result = await Subject.findByIdAndUpdate(req.params.id, updatedSubject).populate("labPeriods").populate("tutPeriods").populate("lectPeriods");
+    console.log(result);
     res.json(result);
   } catch (error) {
     console.error(error.message);
@@ -57,6 +61,26 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+
+    const schedules = await Schedule.find();
+
+    schedules.forEach(async (schedule) => {
+      schedule.subjects.filter((ele) => { ele != req.params.id });
+      await Schedule.findByIdAndUpdate(schedule._id, schedule);
+    });
+
+    const subjects = await Subject.findById(req.params.id);
+
+    subjects.lectPeriods.forEach(async (period) => {
+      await Period.findByIdAndDelete(period._id);
+    })
+    subjects.labPeriods.forEach(async (period) => {
+      await Period.findByIdAndDelete(period._id);
+    })
+    subjects.tutPeriods.forEach(async (period) => {
+      await Period.findByIdAndDelete(period._id);
+    })
+
     const subject = await Subject.findByIdAndDelete(req.params.id);
     if (!subject) {
       return res.status(400).json({ msg: "Subject not found" });

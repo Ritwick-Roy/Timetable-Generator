@@ -166,7 +166,6 @@ int main(void)
             for(i=0;i<httpHeader.size();++i)
             str[i]=httpHeader[i];
             str[i]='\0';
-            cout<<"SENT:\n"<<str<<"\n";
             send(clientSocket, str, sizeof(str), 0);
         }
         close(clientSocket);

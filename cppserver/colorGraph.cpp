@@ -112,7 +112,7 @@ void makeIds()
                 p[subjects[i].Tut[TUTSIZE * j + k].id]=k;
             }
         }
-        cout << "\n";
+        // cout << "\n";
     }
 }
 
@@ -323,29 +323,32 @@ void solve()
         {
             size = LECTSIZE;
             subjects[i].Lecture.resize(size * subjects[i].lectCount); // basically initialised lectcount number of periods for lectures
-            // cout << "Enter lecturer name: ";
-            ss >> s1;
-            // cout << "Enter number of groups attending: ";
-            ss >> groupCount;
-            vector<string> tempGroup;
-            while (groupCount--)
+            for (j = 0; j < subjects[i].lectCount; j++)
             {
-                ss >> s2;
-                tempGroup.pb(s2);
-            }
-            // cout << "Enter room: ";
-            ss >> s3;
-            // cout << "Enter bans: ";
-            ss >> s4;
-            for (k = 0; k < LECTSIZE; k++)
-            {
-                for (j = 0; j < subjects[i].lectCount; j++)
+                // cout << "Enter lecturer name: ";
+                ss >> s1;
+                // cout << "Enter number of groups attending: ";
+                ss >> groupCount;
+                vector<string> tempGroup;
+                while (groupCount--)
                 {
-                    subjects[i].Lecture[LECTSIZE * j + k].Room = s3;
-                    subjects[i].Lecture[LECTSIZE * j + k].Group = tempGroup;
-                    subjects[i].Lecture[LECTSIZE * j + k].Prof = s1;
-                    subjects[i].Lecture[LECTSIZE * j + k].Bans = s4;
-                    subjects[i].Lecture[LECTSIZE * j + k].subjectName = subjects[i].name+"-L";
+                    ss >> s2;
+                    tempGroup.pb(s2);
+                }
+                // cout << "Enter room: ";
+                ss >> s3;
+                // cout << "Enter bans: ";
+                ss >> s4;
+                for (k = 0; k < size; k++)
+                {
+                    // for (j = 0; j < subjects[i].lectCount; j++)
+                    {
+                        subjects[i].Lecture[size * j + k].Room = s3;
+                        subjects[i].Lecture[size * j + k].Group = tempGroup;
+                        subjects[i].Lecture[size * j + k].Prof = s1;
+                        subjects[i].Lecture[size * j + k].Bans = s4;
+                        subjects[i].Lecture[size * j + k].subjectName = subjects[i].name+"-L";
+                    }
                 }
             }
         }
@@ -459,7 +462,6 @@ void solve()
     // ids of all
     makeIds();
     makeGraph();
-    
 
     // cout<<"part numbers:\n";
     // for(i=0;i<vertices;i++)
@@ -477,6 +479,7 @@ void solve()
 // {
 //     ios_base::sync_with_stdio(false);
 //     cin.tie(NULL);
+//     input="5 5 4 6 NA 3 tina 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 tina 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 tina 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 0 4 tina 1 L1 C1 111111111111111111111111111111111111111111111 tina 1 L2 C1 111111111111111111111111111111111111111111111 pankaj 1 M1 C2 111111111111111111111111111111111111111111111 pankaj 1 M2 C2 111111111111111111111111111111111111111111111 DMS 3 vivek 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 vivek 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 vivek 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 4 vivek 1 L1 S1 111111111111111111111111111111111111111111111 vivek 1 L2 S1 111111111111111111111111111111111111111111111 vivek 1 M1 S1 111111111111111111111111111111111111111111111 vivek 1 M2 S1 111111111111111111111111111111111111111111111 0 CAO 3 vivek 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 vivek 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 vivek 4 L1 L2 M1 M2 audi 111111111111111111111111111111111111111111111 0 0 PC 1 vivek 4 L1 L2 M1 M2 111111111111111111111111111111111111111111111 audi 0 4 vivek 1 L1 C2 111111111111111111111111111111111111111111111 manisha 1 L2 C1 111111111111111111111111111111111111111111111 deep 1 M1 C2 111111111111111111111111111111111111111111111 jain 1 M2 C2 111111111111111111111111111111111111111111111 DSA 3 manisha 4 L1 L2  M1 M2 audi 111111111111111111111111111111111111111111111 manisha 4 L1 L2  M1 M2 audi 111111111111111111111111111111111111111111111 manisha 4 L1 L2  M1 M2 audi 111111111111111111111111111111111111111111111 0 4 manisha 1 L1 C2 111111111111111111111111111111111111111111111 manisha 1 L2 C2 111111111111111111111111111111111111111111111 manisha 1 M1 C1 111111111111111111111111111111111111111111111 manisha 1 M2 C1 111111111111111111111111111111111111111111111 OS 3 jain 4 L1 L2  M1 M2 audi 111111111111111111111111111111111111111111111 jain 4 L1 L2  M1 M2 audi 111111111111111111111111111111111111111111111 jain 4 L1 L2  M1 M2 audi 111111111111111111111111111111111111111111111 0 4 jain 1 L1 C2 111111111111111111111111111111111111111111111 jain 1 L2 C2 111111111111111111111111111111111111111111111 jain 1 M1 C1 111111111111111111111111111111111111111111111 jain 1 M2 C2 111111111111111111111111111111111111111111111";
 //     solve();
 //     return 0;
 // }

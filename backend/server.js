@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 5000;
 const scheduleApiRoutes = require("./routes/scheduleApi");
 const subjectApiRoutes = require("./routes/subjectApi");
 const periodApiRoutes = require("./routes/periodApi");
+const timetableApiRoutes = require("./routes/timetableApi");
 
 app.use(morgan("dev"));
 
@@ -19,6 +20,7 @@ app.use(express.json({ extended: false }));
 app.use("/api/schedule", scheduleApiRoutes);
 app.use("/api/subject", subjectApiRoutes);
 app.use("/api/period",periodApiRoutes);
+app.use("/api/timetable",timetableApiRoutes);
 
 app.get("/", (req, res) => {
   res.send("Default route up!");

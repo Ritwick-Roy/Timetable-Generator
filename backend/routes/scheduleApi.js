@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Schedule = require("../models/Schedule");
+const Period = require("../models/Period");
+const Subject = require("../models/Subject");
 require("dotenv").config();
 
 router.get("/", async (req, res) => {
@@ -34,7 +36,7 @@ router.post("/", async (req, res) => {
 
 router.patch("/:id", async (req,res)=>{
   try {
-    const updatedSchedule = req.body;
+    const { updatedSchedule } = req.body;
     const result = await Schedule.findByIdAndUpdate(req.params.id, updatedSchedule).populate("subjects").populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
     res.json(result);
   } catch (error) {
