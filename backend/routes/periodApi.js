@@ -58,21 +58,18 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const subjects = await Subject.find();
-
-    subjects.forEach( async (subject)=>{
-      subject.lectPeriods.filter((ele)=>{ele!=req.params.id});
-      subject.labPeriods.filter((ele)=>{ele!=req.params.id});
-      subject.tutPeriods.filter((ele)=>{ele!=req.params.id});
-      await Subject.findByIdAndUpdate(subject._id,subject);
-    });
-
+    const subject = req.body.subject;
+    console.log(subject);
+    subject.lectPeriods=subject.lectPeriods.filter((ele)=>{return ele!=req.params.id});
+    subject.labPeriods=subject.labPeriods.filter((ele)=>{return ele!=req.params.id});
+    subject.tutPeriods=subject.tutPeriods.filter((ele)=>{return ele!=req.params.id});
+    console.log(subject);
+    const result=await Subject.findByIdAndUpdate({_id:subject._id},subject);
     const period = await Period.findByIdAndDelete(req.params.id);
-    if (!period) {
+    if (!period || !result) {
       return res.status(400).json({ msg: "Period not found" });
     }
-  
-    res.json(period);
+    res.json({msg:"deleted"});
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

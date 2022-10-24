@@ -7,7 +7,7 @@ require("dotenv").config();
 
 router.get("/", async (req, res) => {
   try {
-    const schedules = await Schedule.find().populate("subjects").populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
+    const schedules = await Schedule.find().populate("subjects");//.populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
     res.json(schedules);
   } catch (error) {
     console.error(error.message);
@@ -37,7 +37,7 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req,res)=>{
   try {
     const { updatedSchedule } = req.body;
-    const result = await Schedule.findByIdAndUpdate(req.params.id, updatedSchedule).populate("subjects").populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
+    const result = await Schedule.findByIdAndUpdate(req.params.id, updatedSchedule).populate("subjects");//.populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
     res.json(result);
   } catch (error) {
     console.error(error.message);
@@ -48,7 +48,7 @@ router.patch("/:id", async (req,res)=>{
 
 router.get("/:id", async (req, res) => {
   try {
-    const schedule = await Schedule.findById(req.params.id).populate("subjects").populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
+    const schedule = await Schedule.findById(req.params.id).populate("subjects");//.populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
     if (!schedule) {
       return res.status(400).json({ msg: "schedule not found" });
     }
