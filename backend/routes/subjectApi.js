@@ -18,7 +18,6 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { subjectName, labPeriods, tutPeriods, lectPeriods } = req.body;
-    console.log(req.body);
     const subject = new Subject({
       subjectName,
       labPeriods,
@@ -61,31 +60,28 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-
-    const schedules = await Schedule.find();
-
-    schedules.forEach(async (schedule) => {
-      schedule.subjects.filter((ele) => { ele != req.params.id });
-      await Schedule.findByIdAndUpdate(schedule._id, schedule);
-    });
-
-    const subjects = await Subject.findById(req.params.id);
-
-    subjects.lectPeriods.forEach(async (period) => {
-      await Period.findByIdAndDelete(period._id);
+    const subject = await Subject.findById(req.params.id).populate("lectPeriods").populate("labPeriods").populate("tutPeriods");
+    const schedule=req.body.schedule;
+    schedule.subjects=schedule.subjects.filter((subject)=>{return subject!=req.params.id});
+    const periods = []
+    subject.lectPeriods.map((lect) => {
+      periods.push(lect);
     })
-    subjects.labPeriods.forEach(async (period) => {
-      await Period.findByIdAndDelete(period._id);
+    subject.labPeriods.map((lab) => {
+      periods.push(lab);
     })
-    subjects.tutPeriods.forEach(async (period) => {
-      await Period.findByIdAndDelete(period._id);
+    subject.tutPeriods.map((tut) => {
+      periods.push(tut);
     })
+    
+    const updateSchedule = await Schedule.findByIdAndUpdate({_id:schedule._id},schedule);
+    const deletePeriods = await Period.deleteMany({ _id: { $in: periods } });
+    const deleteSubject = await Subject.deleteOne({ _id: subject._id });
 
-    const subject = await Subject.findByIdAndDelete(req.params.id);
-    if (!subject) {
-      return res.status(400).json({ msg: "Subject not found" });
+    if (!deletePeriods || !deleteSubject || !updateSchedule) {
+      return res.status(400).json({ msg: "could not delete" });
     }
-    res.json(subject);
+    res.json({msg:"deleted"});
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

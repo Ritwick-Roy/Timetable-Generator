@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
     console.error(error.message);
     res.status(500).send("Server error");
   }
-});
+}); 
 
 router.patch("/:id", async (req,res)=>{
   try {
@@ -61,11 +61,28 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const schedule = await Schedule.findByIdAndDelete(req.params.id);
-    if (!schedule) {
-      return res.status(400).json({ msg: "schedule not found" });
+    const schedule=await Schedule.findById(req.params.id).populate("subjects");
+    const subjects=schedule.subjects;
+    const periods=[]
+    subjects.map((subject)=>{
+      subject.lectPeriods.map((lect)=>{
+        periods.push(lect);
+      })
+      subject.labPeriods.map((lab)=>{
+        periods.push(lab);
+      })
+      subject.tutPeriods.map((tut)=>{
+        periods.push(tut);
+      })
+    })
+    const deletePeriods = await Period.deleteMany({_id:{$in:periods}});
+    const deleteSubjects = await Subject.deleteMany({_id:{$in:subjects}});
+    const deleteSchedule = await Schedule.deleteOne({_id:schedule._id});
+
+    if (!deleteSchedule || !deletePeriods || !deleteSubjects) {
+      return res.status(400).json({ msg: "could not delete" });
     }
-    res.json(schedule);
+    res.json({subjects,periods,deletePeriods,deleteSubjects,deleteSchedule});
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

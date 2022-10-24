@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useParams } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useLocation, useParams } from "react-router-dom";
 import axios from 'axios';
 import { getBaseUrl } from '../utils';
 import Table from '../Table'
@@ -18,11 +18,13 @@ const CreatePeriod = () => {
   useEffect(() => {
     setSchedule(location.state.schedule);
     let res="";
-    for(let i=0;i<schedule.days*(schedule.beforeBreak+schedule.afterBreak);++i)
+    for(let i=0;i<location.state.schedule.days*(location.state.schedule.beforeBreak+location.state.schedule.afterBreak);++i)
     res+=1;
-    setBans(res)
+    console.log(res);
+    setBans(res);
     axios.get(`${getBaseUrl()}/api/subject/${subjectId}`)
       .then((res) => setSubject(res.data));
+    console.log(schedule);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const submitHandler = async (e) => {
@@ -65,7 +67,6 @@ const CreatePeriod = () => {
     setProfessor('');
     setRoom('');
     setGroupNames([]);
-    setBans('');
   }
 
   return (
@@ -96,18 +97,21 @@ const CreatePeriod = () => {
         <input
           type="text"
           placeholder='name'
+          value={professor}
           onChange={(e) => setProfessor(e.target.value)}
           name="name" />
         <label htmlFor="room">Room:</label>
         <input
           type="text"
           placeholder='L223'
+          value={room}
           onChange={(e) => setRoom(e.target.value)}
           name="days" />
         <label htmlFor="groupNames">Names of groups (comma seperated):</label>
         <input
           type="text"
           placeholder='A,B,C..'
+          value={groupNames}
           onChange={(e) => setGroupNames(e.target.value)}
           name="days" />
         Bans: {bans}

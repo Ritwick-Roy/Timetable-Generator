@@ -9,7 +9,7 @@ const CreateSubject = () => {
   const [schedule, setSchedule] = useState(location.state.schedule);
   const [subjectName, setSubjectName] = useState('');
   const { scheduleId } = useParams();
-  console.log(location.state.schedule);
+
   const submitHandler = async (e) => {
     e.preventDefault();
     const res = await axios.post(`${getBaseUrl()}/api/subject`,
