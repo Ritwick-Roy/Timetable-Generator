@@ -17,7 +17,6 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { professor, groupNames, room, bans } = req.body;
-    console.log(req.body);
     const period = new Period({
       professor,
       groupNames,
@@ -32,7 +31,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req,res)=>{
+router.patch("/:id", async (req, res) => {
   try {
     const updatedPeriod = req.body;
     const result = await Period.findByIdAndUpdate(req.params.id, updatedPeriod);
@@ -59,17 +58,17 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const subject = req.body.subject;
-    console.log(subject);
-    subject.lectPeriods=subject.lectPeriods.filter((ele)=>{return ele!=req.params.id});
-    subject.labPeriods=subject.labPeriods.filter((ele)=>{return ele!=req.params.id});
-    subject.tutPeriods=subject.tutPeriods.filter((ele)=>{return ele!=req.params.id});
-    console.log(subject);
-    const result=await Subject.findByIdAndUpdate({_id:subject._id},subject);
+
+    subject.lectPeriods = subject.lectPeriods.filter((ele) => { return ele._id != req.params.id });
+    subject.labPeriods = subject.labPeriods.filter((ele) => { return ele._id != req.params.id });
+    subject.tutPeriods = subject.tutPeriods.filter((ele) => { return ele._id != req.params.id });
+
+    const result = await Subject.findByIdAndUpdate({ _id: subject._id }, subject);
     const period = await Period.findByIdAndDelete(req.params.id);
     if (!period || !result) {
-      return res.status(400).json({ msg: "Period not found" });
+      return res.status(400).json({ msg: "could not delete" });
     }
-    res.json({msg:"deleted"});
+    res.json({ msg: "deleted" });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

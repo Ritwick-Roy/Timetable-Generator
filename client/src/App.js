@@ -8,7 +8,7 @@ import NotFound from './NotFound'
 import CreatePeriod from './Create/CreatePeriod'
 import CreateSchedule from './Create/CreateSchedule'
 import CreateSubject from './Create/CreateSubject'
-import Rough from './Rough';
+import GenerateSchedule from './GenerateSchedule';
 import Footer from './components/Footer'
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
           <Route path="/schedule" element={<CreateSchedule />} />
           <Route path="/schedule/:scheduleId" element={<CreateSubject />} />
           <Route path="/schedule/:scheduleId/:subjectId" element={<CreatePeriod />} />
-          <Route path="/table" element={<Rough />} />
+          <Route path="/generate/:scheduleId" element={<GenerateSchedule/>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />

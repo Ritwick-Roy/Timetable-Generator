@@ -19,7 +19,7 @@ fstream fin("input.txt",ios::in|ios::out);
 
 
 // colorLimit is max times a period can be assigned
-ll vertices, subjectCount, number = -1, maxColor = 100, maxAllowedClasses = 2, beforeBreak, afterBreak, days, Lects = 0, Labs = 0, Tuts = 0;
+ll vertices, subjectCount, number = -1, maxColor = 100, maxAllowedClasses = 4, beforeBreak, afterBreak, days, Lects = 0, Labs = 0, Tuts = 0;
 
 class Period
 {

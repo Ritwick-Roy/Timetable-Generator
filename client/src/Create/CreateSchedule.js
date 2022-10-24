@@ -40,6 +40,17 @@ const CreateSchedule = () => {
     setRefresh(!refresh);
   }
 
+  const deleteHandler = async (e, scheduleId) => {
+    e.preventDefault();
+    await axios.delete(`${getBaseUrl()}/api/schedule/${scheduleId}`, {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    setRefresh(!refresh);
+  }
+
   return (
     <div>
       <h1>CreateSchedule</h1>
@@ -82,7 +93,9 @@ const CreateSchedule = () => {
           <li key="numOfDays">Number of days: {schedule.days}</li>
           <li key="beforeBreak">Number of periods before break: {schedule.beforeBreak}</li>
           <li key="afterBreak">Number of periods after break: {schedule.afterBreak}</li>
-          <Link to={`/schedule/${schedule._id}`} state={{schedule}}>Manage subjects</Link>
+          <Link to={`/generate/${schedule._id}`} state={{ schedule }}>Generate schedule</Link>
+          <Link to={`/schedule/${schedule._id}`} state={{ schedule }}>Manage subjects</Link>
+          <button onClick={(e) => deleteHandler(e, schedule._id)}>Delete schedule</button>
         </div>
       ))}
     </div>

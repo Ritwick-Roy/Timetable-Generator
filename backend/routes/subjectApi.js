@@ -35,9 +35,7 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const { updatedSubject } = req.body;
-    console.log(updatedSubject);
     const result = await Subject.findByIdAndUpdate(req.params.id, updatedSubject).populate("labPeriods").populate("tutPeriods").populate("lectPeriods");
-    console.log(result);
     res.json(result);
   } catch (error) {
     console.error(error.message);
@@ -61,8 +59,8 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const subject = await Subject.findById(req.params.id).populate("lectPeriods").populate("labPeriods").populate("tutPeriods");
-    const schedule=req.body.schedule;
-    schedule.subjects=schedule.subjects.filter((subject)=>{return subject!=req.params.id});
+    const schedule = req.body.schedule;
+    schedule.subjects = schedule.subjects.filter((subject) => { return subject._id != req.params.id });
     const periods = []
     subject.lectPeriods.map((lect) => {
       periods.push(lect);
@@ -73,15 +71,15 @@ router.delete("/:id", async (req, res) => {
     subject.tutPeriods.map((tut) => {
       periods.push(tut);
     })
-    
-    const updateSchedule = await Schedule.findByIdAndUpdate({_id:schedule._id},schedule);
+
+    const updateSchedule = await Schedule.findByIdAndUpdate({ _id: schedule._id }, schedule);
     const deletePeriods = await Period.deleteMany({ _id: { $in: periods } });
     const deleteSubject = await Subject.deleteOne({ _id: subject._id });
 
     if (!deletePeriods || !deleteSubject || !updateSchedule) {
       return res.status(400).json({ msg: "could not delete" });
     }
-    res.json({msg:"deleted"});
+    res.json({ msg: "deleted" });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

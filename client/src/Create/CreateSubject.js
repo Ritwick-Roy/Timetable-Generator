@@ -8,6 +8,7 @@ const CreateSubject = () => {
   const location = useLocation();
   const [schedule, setSchedule] = useState(location.state.schedule);
   const [subjectName, setSubjectName] = useState('');
+  const [refresh, setRefresh] = useState(false);
   const { scheduleId } = useParams();
 
   const submitHandler = async (e) => {
@@ -21,16 +22,15 @@ const CreateSubject = () => {
           "Content-Type": "application/json",
         },
       })
-      
-    
-    const new_schedule=schedule;
-    new_schedule.subjects=[...schedule.subjects,res.data];
+
+    const new_schedule = schedule;
+    new_schedule.subjects = [...schedule.subjects, res.data];
     setSchedule(new_schedule);
     // setSchedule((s)=>({...s,subjects:[...s.subjects,res.data]}));
 
     await axios.patch(`${getBaseUrl()}/api/schedule/${scheduleId}`,
       {
-        updatedSchedule:schedule
+        updatedSchedule: schedule
       },
       {
         headers: {
@@ -38,6 +38,21 @@ const CreateSubject = () => {
         },
       })
     setSubjectName('');
+  }
+
+  const deleteHandler = async (e, subjectId) => {
+    e.preventDefault();
+    await axios.delete(`${getBaseUrl()}/api/subject/${subjectId}`,
+      {
+        data: {
+          schedule
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    setRefresh(!refresh);
+    // setSubjectName('');
   }
 
   return (
@@ -66,7 +81,8 @@ const CreateSubject = () => {
       {schedule.subjects.map((subject) => (
         <div>
           <li>{subject.subjectName}</li>
-          <Link to={`/schedule/${scheduleId}/${subject._id}`} state={{ subject,schedule }}>Manage Periods</Link>
+          <Link to={`/schedule/${scheduleId}/${subject._id}`} state={{ subject, schedule }}>Manage Periods</Link>
+          <button onClick={(e) => deleteHandler(e, subject._id)}>Delete subject</button>
         </div>
       ))}
     </div>

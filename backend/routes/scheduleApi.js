@@ -18,7 +18,6 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { name, days, beforeBreak, afterBreak, subjects } = req.body;
-    console.log(req.body);
     const schedule = new Schedule({
       name,
       days,
@@ -32,9 +31,9 @@ router.post("/", async (req, res) => {
     console.error(error.message);
     res.status(500).send("Server error");
   }
-}); 
+});
 
-router.patch("/:id", async (req,res)=>{
+router.patch("/:id", async (req, res) => {
   try {
     const { updatedSchedule } = req.body;
     const result = await Schedule.findByIdAndUpdate(req.params.id, updatedSchedule).populate("subjects");//.populate("subjects.lectPeriods").populate("subjects.tutPeriods").populate("subjects.labPeriods");
@@ -61,28 +60,28 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const schedule=await Schedule.findById(req.params.id).populate("subjects");
-    const subjects=schedule.subjects;
-    const periods=[]
-    subjects.map((subject)=>{
-      subject.lectPeriods.map((lect)=>{
+    const schedule = await Schedule.findById(req.params.id).populate("subjects");
+    const subjects = schedule.subjects;
+    const periods = []
+    subjects.map((subject) => {
+      subject.lectPeriods.map((lect) => {
         periods.push(lect);
       })
-      subject.labPeriods.map((lab)=>{
+      subject.labPeriods.map((lab) => {
         periods.push(lab);
       })
-      subject.tutPeriods.map((tut)=>{
+      subject.tutPeriods.map((tut) => {
         periods.push(tut);
       })
     })
-    const deletePeriods = await Period.deleteMany({_id:{$in:periods}});
-    const deleteSubjects = await Subject.deleteMany({_id:{$in:subjects}});
-    const deleteSchedule = await Schedule.deleteOne({_id:schedule._id});
+    const deletePeriods = await Period.deleteMany({ _id: { $in: periods } });
+    const deleteSubjects = await Subject.deleteMany({ _id: { $in: subjects } });
+    const deleteSchedule = await Schedule.deleteOne({ _id: schedule._id });
 
     if (!deleteSchedule || !deletePeriods || !deleteSubjects) {
       return res.status(400).json({ msg: "could not delete" });
     }
-    res.json({subjects,periods,deletePeriods,deleteSubjects,deleteSchedule});
+    res.json({ subjects, periods, deletePeriods, deleteSubjects, deleteSchedule });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

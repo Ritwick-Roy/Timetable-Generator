@@ -11,20 +11,15 @@ const CreatePeriod = () => {
   const [professor, setProfessor] = useState('');
   const [room, setRoom] = useState('');
   const [groupNames, setGroupNames] = useState([]);
-  const [bans, setBans] = useState('');
+  const [bans, setBans] = useState('none');
   const [periodType, setPeriodType] = useState('lab');
   const { subjectId } = useParams();
 
   useEffect(() => {
     setSchedule(location.state.schedule);
-    let res="";
-    for(let i=0;i<location.state.schedule.days*(location.state.schedule.beforeBreak+location.state.schedule.afterBreak);++i)
-    res+=1;
-    console.log(res);
-    setBans(res);
     axios.get(`${getBaseUrl()}/api/subject/${subjectId}`)
       .then((res) => setSubject(res.data));
-    console.log(schedule);
+    console.log(location.state.schedule);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const submitHandler = async (e) => {
@@ -67,6 +62,22 @@ const CreatePeriod = () => {
     setProfessor('');
     setRoom('');
     setGroupNames([]);
+    setBans('none');
+  }
+
+  const deleteHandler = async (e, periodId) => {
+    e.preventDefault();
+    await axios.delete(`${getBaseUrl()}/api/period/${periodId}`,
+      {
+        data: {
+          subject
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    // setRefresh(!refresh);
+    // setSubjectName('');
   }
 
   return (
@@ -128,7 +139,8 @@ const CreatePeriod = () => {
           <li>Room:{period.room}</li>
           <li>Allowed slots:{period.bans}</li>
           <li>Batches:{period.groupNames}</li>
-          <br/>
+          <button onClick={(e) => deleteHandler(e, period._id)}>Delete period</button>
+          <br />
         </div>
       ))}
       {subject.labPeriods.length && (<h3>Labs:</h3>)}
@@ -138,7 +150,8 @@ const CreatePeriod = () => {
           <li>Room:{period.room}</li>
           <li>Allowed slots:{period.bans}</li>
           <li>Batches:{period.groupNames}</li>
-          <br/>
+          <button onClick={(e) => deleteHandler(e, period._id)}>Delete period</button>
+          <br />
         </div>
       ))}
       {subject.tutPeriods.length && (<h3>Tuts:</h3>)}
@@ -148,7 +161,8 @@ const CreatePeriod = () => {
           <li>Room:{period.room}</li>
           <li>Allowed slots:{period.bans}</li>
           <li>Batches:{period.groupNames}</li>
-          <br/>
+          <button onClick={(e) => deleteHandler(e, period._id)}>Delete period</button>
+          <br />
         </div>
       ))}
     </div>
