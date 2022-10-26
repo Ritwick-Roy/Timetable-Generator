@@ -14,12 +14,12 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <Link to="/">
-        <h1>Sputnik</h1>
+        <h1>TimeTable Generator</h1>
       </Link>
       <div className="links">
         <Link
           className="predict-link"
-          to="/timetable"
+          to="/schedule"
           style={{
             color: isHovering ? "#333":"white",
             backgroundColor: isHovering ? "":"#09a188",
@@ -28,9 +28,9 @@ const Navbar = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          Timetable
+          Schedules
         </Link>
-        <Link to="/schedule">Create Schedule</Link>
+        {/* <Link to="/schedule">Schedules</Link> */}
         <Link to="/about">About</Link>
       </div>
     </nav>

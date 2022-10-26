@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from "react-router-dom";
 import axios from 'axios';
 import { getBaseUrl } from '../utils';
-import Table from '../Table'
+import Table from '../pages/Table'
 const CreatePeriod = () => {
 
   const location = useLocation();
