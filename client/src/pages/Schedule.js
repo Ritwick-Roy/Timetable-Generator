@@ -22,7 +22,7 @@ const Schedule = ({ rows, columns, periods }) => {
             }
         }
         console.log(timetable.current);
-    }, [rows, columns, refresh])
+    }, [rows, columns, refresh]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div>

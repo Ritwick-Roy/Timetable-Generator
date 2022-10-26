@@ -17,15 +17,18 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { subjectName, labPeriods, tutPeriods, lectPeriods } = req.body;
+    const { subjectName, labPeriods, tutPeriods, lectPeriods, schedule } = req.body;
     const subject = new Subject({
       subjectName,
       labPeriods,
       tutPeriods,
       lectPeriods
     });
-    const result = await subject.save();
-    res.json(result);
+
+    const createSubject = await subject.save();
+    schedule.subjects = [...schedule.subjects, createSubject];
+    const updateSchedule = await Schedule.findByIdAndUpdate({ _id: schedule._id }, schedule).populate("subjects");
+    res.json({ createSubject, updateSchedule, schedule });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
@@ -79,7 +82,7 @@ router.delete("/:id", async (req, res) => {
     if (!deletePeriods || !deleteSubject || !updateSchedule) {
       return res.status(400).json({ msg: "could not delete" });
     }
-    res.json({ msg: "deleted" });
+    res.json({ msg: "deleted", schedule });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");

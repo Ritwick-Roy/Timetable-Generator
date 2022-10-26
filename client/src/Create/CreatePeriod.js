@@ -13,61 +13,44 @@ const CreatePeriod = () => {
   const [groupNames, setGroupNames] = useState([]);
   const [bans, setBans] = useState('none');
   const [periodType, setPeriodType] = useState('lab');
-  const { subjectId } = useParams();
+  const [refresh, setRefresh] = useState(false);
+  const { scheduleId, subjectId } = useParams();
 
   useEffect(() => {
-    setSchedule(location.state.schedule);
+    axios.get(`${getBaseUrl()}/api/schedule/${scheduleId}`)
+      .then((res) => {
+        setSchedule(res.data);
+      })
     axios.get(`${getBaseUrl()}/api/subject/${subjectId}`)
-      .then((res) => setSubject(res.data));
-    console.log(location.state.schedule);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+      .then((res) => { setSubject(res.data) });
+  }, [scheduleId,subjectId]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const groupName = groupNames.split(',');
-    const period = await axios.post(`${getBaseUrl()}/api/period`,
+    const postPeriod = await axios.post(`${getBaseUrl()}/api/period`,
       {
         professor,
         room,
-        groupNames: groupName,
-        bans
+        groupNames: groupNames.split(','),
+        bans,
+        periodType,
+        subject
       },
       {
         headers: {
           "Content-Type": "application/json",
         },
       })
-    const new_subject = subject;
-    console.log(periodType);
-    if (periodType === "lab") {
-      new_subject.labPeriods = [...subject.labPeriods, period.data];
-    }
-    else if (periodType === "lect") {
-      new_subject.lectPeriods = [...subject.lectPeriods, period.data];
-    }
-    else {
-      new_subject.tutPeriods = [...subject.tutPeriods, period.data];
-    }
-    setSubject(new_subject);
-
-    await axios.patch(`${getBaseUrl()}/api/subject/${subjectId}`,
-      {
-        updatedSubject: subject
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    setSubject(postPeriod.data.subject);
     setProfessor('');
     setRoom('');
     setGroupNames([]);
     setBans('none');
   }
 
-  const deleteHandler = async (e, periodId) => {
+  const deleteHandler = async (e, period) => {
     e.preventDefault();
-    await axios.delete(`${getBaseUrl()}/api/period/${periodId}`,
+    const deletePeriod = await axios.delete(`${getBaseUrl()}/api/period/${period._id}`,
       {
         data: {
           subject
@@ -76,12 +59,13 @@ const CreatePeriod = () => {
           "Content-Type": "application/json",
         },
       })
-    // setRefresh(!refresh);
-    // setSubjectName('');
+    setSubject(deletePeriod.data.subject);
+    setRefresh(!refresh);
   }
 
   return (
     <div className="period">
+      {refresh}
       <h1>CreatePeriod</h1>
 
       {
@@ -132,36 +116,36 @@ const CreatePeriod = () => {
       </form>
       <Table rows={schedule.days} columns={schedule.beforeBreak + schedule.afterBreak} setBans={setBans} />
 
-      {subject.lectPeriods.length && (<h3>Lectures:</h3>)}
+      {subject.lectPeriods.length ? (<h3>Lectures:</h3>) : (<p />)}
       {subject.lectPeriods.map((period) => (
         <div>
           <li>Faculty:{period.professor}</li>
           <li>Room:{period.room}</li>
           <li>Allowed slots:{period.bans}</li>
           <li>Batches:{period.groupNames}</li>
-          <button onClick={(e) => deleteHandler(e, period._id)}>Delete period</button>
+          <button onClick={(e) => deleteHandler(e, period)}>Delete period</button>
           <br />
         </div>
       ))}
-      {subject.labPeriods.length && (<h3>Labs:</h3>)}
+      {subject.labPeriods.length ? (<h3>Labs:</h3>) : (<p />)}
       {subject.labPeriods.map((period) => (
         <div>
           <li>Faculty:{period.professor}</li>
           <li>Room:{period.room}</li>
           <li>Allowed slots:{period.bans}</li>
           <li>Batches:{period.groupNames}</li>
-          <button onClick={(e) => deleteHandler(e, period._id)}>Delete period</button>
+          <button onClick={(e) => deleteHandler(e, period)}>Delete period</button>
           <br />
         </div>
       ))}
-      {subject.tutPeriods.length && (<h3>Tuts:</h3>)}
+      {subject.tutPeriods.length ? (<h3>Tuts:</h3>) : (<p />)}
       {subject.tutPeriods.map((period) => (
         <div>
           <li>Faculty:{period.professor}</li>
           <li>Room:{period.room}</li>
           <li>Allowed slots:{period.bans}</li>
           <li>Batches:{period.groupNames}</li>
-          <button onClick={(e) => deleteHandler(e, period._id)}>Delete period</button>
+          <button onClick={(e) => deleteHandler(e, period)}>Delete period</button>
           <br />
         </div>
       ))}

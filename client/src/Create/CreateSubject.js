@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from "react-router-dom";
 import axios from 'axios';
 import { getBaseUrl } from '../utils';
@@ -11,38 +11,32 @@ const CreateSubject = () => {
   const [refresh, setRefresh] = useState(false);
   const { scheduleId } = useParams();
 
+  useEffect(() => {
+    axios.get(`${getBaseUrl()}/api/schedule/${scheduleId}`)
+      .then((res) => {
+        setSchedule(res.data);
+      })
+  }, [scheduleId])
+
   const submitHandler = async (e) => {
     e.preventDefault();
-    const res = await axios.post(`${getBaseUrl()}/api/subject`,
+    const postSubject = await axios.post(`${getBaseUrl()}/api/subject`,
       {
         subjectName,
+        schedule
       },
       {
         headers: {
           "Content-Type": "application/json",
         },
       })
-
-    const new_schedule = schedule;
-    new_schedule.subjects = [...schedule.subjects, res.data];
-    setSchedule(new_schedule);
-    // setSchedule((s)=>({...s,subjects:[...s.subjects,res.data]}));
-
-    await axios.patch(`${getBaseUrl()}/api/schedule/${scheduleId}`,
-      {
-        updatedSchedule: schedule
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+    setSchedule(postSubject.data.schedule);
     setSubjectName('');
   }
 
   const deleteHandler = async (e, subjectId) => {
     e.preventDefault();
-    await axios.delete(`${getBaseUrl()}/api/subject/${subjectId}`,
+    const deleteSubject = await axios.delete(`${getBaseUrl()}/api/subject/${subjectId}`,
       {
         data: {
           schedule
@@ -51,21 +45,20 @@ const CreateSubject = () => {
           "Content-Type": "application/json",
         },
       })
+    setSchedule(deleteSubject.data.schedule);
     setRefresh(!refresh);
-    // setSubjectName('');
   }
 
   return (
     <div>
+      {refresh}
       <h1>CreateSubject</h1>
-
       <div>
         <li key="schedule-name">Schedule name: {schedule.name}</li>
         <li key="numOfDays">Number of days: {schedule.days}</li>
         <li key="beforeBreak">Number of periods before break: {schedule.beforeBreak}</li>
         <li key="afterBreak">Number of periods after break: {schedule.afterBreak}</li>
       </div>
-
       <form onSubmit={submitHandler}>
         <label htmlFor="name">Subjects Name:</label>
         <input

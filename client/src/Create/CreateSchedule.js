@@ -5,7 +5,6 @@ import { getBaseUrl } from '../utils';
 
 const CreateSchedule = () => {
 
-  const [refresh, setRefresh] = useState(false);
   const [name, setName] = useState('');
   const [days, setDays] = useState(0);
   const [beforeBreak, setBeforeBreak] = useState(0);
@@ -17,11 +16,11 @@ const CreateSchedule = () => {
       .then((res) => {
         setSchedules(res.data);
       });
-  }, [refresh]);
+  }, []);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    await axios.post(`${getBaseUrl()}/api/schedule`,
+    const res = await axios.post(`${getBaseUrl()}/api/schedule`,
       {
         name,
         days,
@@ -33,11 +32,13 @@ const CreateSchedule = () => {
           "Content-Type": "application/json",
         },
       })
+    const new_schedules = schedules;
+    new_schedules.push(res.data);
+    setSchedules(new_schedules);
     setName('');
     setDays(0);
     setBeforeBreak(0);
     setAfterBreak(0);
-    setRefresh(!refresh);
   }
 
   const deleteHandler = async (e, scheduleId) => {
@@ -48,7 +49,8 @@ const CreateSchedule = () => {
           "Content-Type": "application/json",
         },
       })
-    setRefresh(!refresh);
+    const new_schedules=schedules.filter((schedule)=>{ return schedule._id !== scheduleId})
+    setSchedules(new_schedules);
   }
 
   return (
