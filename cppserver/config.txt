@@ -1,4 +1,0 @@
-PORT: 8000
-PAGES:
-details /home/ritwick/Desktop/httpcpp/ttgen/cppserver/details.html
-stack /home/ritwick/Desktop/httpcpp/ttgen/cppserver/stack.html

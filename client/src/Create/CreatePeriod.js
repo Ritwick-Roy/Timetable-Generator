@@ -23,7 +23,7 @@ const CreatePeriod = () => {
       })
     axios.get(`${getBaseUrl()}/api/subject/${subjectId}`)
       .then((res) => { setSubject(res.data) });
-  }, [scheduleId,subjectId]);
+  }, [scheduleId, subjectId]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ const CreatePeriod = () => {
       }
 
       <form onSubmit={submitHandler}>
-        <label htmlfor="period-type">Choose period type:
+        <label htmlFor="period-type">Choose period type:
           <select name="period-type" id="period-type" value={periodType} onChange={(e) => setPeriodType(e.target.value)}>
             <option value="lab">Lab</option>
             <option value="lect">Lecture</option>

@@ -5,42 +5,42 @@ const Table = ({ rows, columns, setBans }) => {
 
     const [periods, setPeriods] = useState([]);
     const [refresh, setRefresh] = useState(false);
-    const data = useRef([])
-    const index = useRef([])
+    const index_row = useRef([])
+    const index_col = useRef([])
 
     const onChangeInput = (e, i, j) => {
         e.preventDefault();
         const { value } = e.target;
-        data.current[i].col_number[j] = value;
-        setPeriods(data.current);
-        parseTT(data.current);
+        const new_periods = periods;
+        if (parseInt(value) === 1)
+            new_periods[i * columns + j] = 0;
+        else
+            new_periods[i * columns + j] = 1;
+        setPeriods(new_periods);
+        parseTT(periods);
         setRefresh(!refresh);
     }
 
     const parseTT = (periods) => {
         let res = "";
         periods.forEach((period) => {
-            for (let i = 0; i < columns; ++i)
-                res += period.col_number[i];
+            res += period.toString();
         })
         setBans(res);
     }
 
     useEffect(() => {
-        let i, j;
-        for (i = 0; i < rows; ++i) {
-            data.current[i] = {};
-            data.current[i]["row_number"] = i;
-            const col = {}
-            for (j = 0; j < columns; ++j)
-                col[j.toString()] = "1"
-            data.current[i]["col_number"] = col;
-        }
-        index.current = [];
+        index_row.current=[]
+        index_col.current=[]
+        let i;
+        for (i = 0; i < rows; ++i)
+        index_row.current[i] = i;
         for (i = 0; i < columns; ++i)
-            index.current[i] = i.toString();
-        data.current = data.current.slice(0, rows);
-        setPeriods(data.current);
+        index_col.current[i] = i;
+        const periods_init=[]
+        for (i = 0; i < rows*columns; ++i)
+        periods_init[i] = 1;
+        setPeriods(periods_init);
     }, [rows, columns])
 
     return (
@@ -50,23 +50,17 @@ const Table = ({ rows, columns, setBans }) => {
                 <thead>
                     <tr>
                         {
-                            index.current.map((item) => (<th>Period{1 + parseInt(item)}</th>))
+                            index_col.current.map((item) => (<th>Period{1 + parseInt(item)}</th>))
                         }
                     </tr>
                 </thead>
                 <tbody>
-                    {periods.map((row) => (
-                        <tr key={row.row_number}>
+                    {index_row.current.map((row) => (
+                        <tr>
                             {
-                                index.current.map((entry) => (
+                                index_col.current.map((col) => (
                                     <td>
-                                        <input
-                                            name="col"
-                                            value={row.col_number[entry]}
-                                            type="text"
-                                            onChange={(e) => onChangeInput(e, row.row_number, entry)}
-                                            placeholder="1"
-                                        />
+                                        <button value={periods[row * columns + col]} onClick={(e) => onChangeInput(e, row, col)}>{periods[row * columns + col]}</button>
                                     </td>
                                 ))
                             }

@@ -16,7 +16,6 @@ const GenerateSchedule = () => {
         setSchedule(location.state.schedule);
         axios.get(`${getBaseUrl()}/api/timetable/${scheduleId}`)
             .then((result) => {
-                console.log(result.data);
                 setPeriods(result.data);
                 setLoading(true);
             });

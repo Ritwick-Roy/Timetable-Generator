@@ -1,1 +1,0 @@
-g++ httpserver.cpp -o server && ./server

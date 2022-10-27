@@ -21,7 +21,6 @@ const Schedule = ({ rows, columns, periods }) => {
                 timetable.current[i][j] = periods[columns * i + j];
             }
         }
-        console.log(timetable.current);
     }, [rows, columns, refresh]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (

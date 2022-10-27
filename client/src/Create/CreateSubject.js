@@ -49,6 +49,21 @@ const CreateSubject = () => {
     setRefresh(!refresh);
   }
 
+  // const updateHandler = async (e, subjectId) => {
+  //   e.preventDefault();
+  //   const updateSubject = await axios.patch(`${getBaseUrl()}/api/subject/${subjectId}`,
+  //     {
+  //       data: {
+  //         subject
+  //       },
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     })
+  //   setSchedule(updateSubject.data.subject);
+  //   setRefresh(!refresh);
+  // }
+
   return (
     <div>
       {refresh}
@@ -75,6 +90,7 @@ const CreateSubject = () => {
         <div>
           <li>{subject.subjectName}</li>
           <Link to={`/schedule/${scheduleId}/${subject._id}`} state={{ subject, schedule }}>Manage Periods</Link>
+          {/* <button onClick={(e) => updateHandler(e, subject._id)}>Update subject</button> */}
           <button onClick={(e) => deleteHandler(e, subject._id)}>Delete subject</button>
         </div>
       ))}

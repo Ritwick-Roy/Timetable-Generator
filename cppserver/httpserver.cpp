@@ -16,9 +16,7 @@
 #include "colorGraph.cpp"
 using namespace std;
 #define QUEUE_LEN 10
-
-int PORT,numberOfPages=-1;
-char routes[1000][1000],path[1000][1000];
+#define PORT 8000
 
 void trim (char *s)
 {
@@ -26,31 +24,6 @@ void trim (char *s)
     while (isspace (*s)) s++;   // skip left side white spaces
     for (i = strlen (s) - 1; (isspace (s[i])); i--) ;   // skip right side white spaces
     s[i + 1] = '\0';
-}
-
-// gets port number and all routes
-void init()
-{
-    FILE* settings=fopen("config.txt","r");
-    char buf[100];
-    int i=0,t;
-    fscanf(settings,"%s",buf);
-    fscanf(settings,"%d",&PORT);
-    fscanf(settings,"%s",buf);
-    while(t!=EOF)
-    {
-        t=fscanf(settings,"%s",buf);
-        trim(buf);
-        strcpy(routes[i],buf);
-        t=fscanf(settings,"%s",buf);
-        trim(buf);
-        strcpy(path[i++],buf);
-        ++numberOfPages;
-    }
-    printf("Number of pages: %d\n",numberOfPages);
-    for(i=0;i<numberOfPages;++i)
-    printf("Route: %s Path: %s\n",routes[i],path[i]);
-    fclose(settings);
 }
 
 void report(struct sockaddr_in *serverAddress)
@@ -71,40 +44,11 @@ void report(struct sockaddr_in *serverAddress)
     cout<<"\n\n\tServer listening on http://"<<hostBuffer<<":"<<serviceBuffer<<"\n";
 }
 
-string setHttpHeader(string filename)
-{
-    filename=filename.substr(1,filename.size());
-    string httpHeader="HTTP/1.1 200 OK\r\n\n",line;
-    int i;
-    cout<<"filename: "<<filename<<"\n";
-    fstream fin;
-    if(filename=="")
-        fin.open("index.html",ios::in|ios::out);
-    else
-    {
-        string buf="notfound.html";
-        for(i=0;i<numberOfPages;++i)
-        if(routes[i]==filename)
-        {
-            cout<<"index: "<<i<<"\n";
-            buf=path[i];        
-        }
-        fin.open(buf,ios::in|ios::out);
-    }
-    while(getline(fin,line))
-    {
-        httpHeader+=line;
-    }
-    fin.close();
-    return httpHeader;
-}
-
 int main(void)
 {
-    init();
-
     int clientSocket,serverSocket,valread,i;
     string method,filename,httpHeader;
+
     if((serverSocket=socket(AF_INET,SOCK_STREAM,0))==0)
     {
         perror("In socket");
@@ -144,16 +88,6 @@ int main(void)
         string buf(buffer);
         stringstream ss(buf);
         ss>>method;
-        if(method=="GET")
-        {
-            ss>>filename;
-            httpHeader=setHttpHeader(filename);
-            char str[httpHeader.size()];
-            for(i=0;i<httpHeader.size();++i)
-            str[i]=httpHeader[i];
-            str[i]='\0';
-            send(clientSocket, str, sizeof(str), 0);
-        }
         if(method=="POST")
         {
             i=buf.find("input");

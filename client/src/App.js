@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
+import ManagePeriod from './Create/ManagePeriod'
 import CreatePeriod from './Create/CreatePeriod'
 import CreateSchedule from './Create/CreateSchedule'
 import CreateSubject from './Create/CreateSubject'
@@ -23,6 +24,7 @@ function App() {
           <Route path="/rough" element={<Schedule />} />
           <Route path="/schedule/:scheduleId" element={<CreateSubject />} />
           <Route path="/schedule/:scheduleId/:subjectId" element={<CreatePeriod />} />
+          <Route path="/schedule/:scheduleId/:subjectId/:periodId" element={<ManagePeriod />} />
           <Route path="/generate/:scheduleId" element={<GenerateSchedule/>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
