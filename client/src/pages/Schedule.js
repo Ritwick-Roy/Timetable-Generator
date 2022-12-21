@@ -18,7 +18,7 @@ const Schedule = ({ rows, columns, periods }) => {
         for (i = 0; i < rows; ++i) {
             timetable.current[i] = []
             for (j = 0; j < columns; ++j) {
-                timetable.current[i][j] = periods[columns * i + j];
+                timetable.current[i][j] = periods[columns * i + j]?periods[columns * i + j]:"-";
             }
         }
     }, [rows, columns, refresh]) // eslint-disable-line react-hooks/exhaustive-deps

@@ -55,16 +55,16 @@ const CreateSchedule = () => {
 
   return (
     <div>
-      <h1>CreateSchedule</h1>
+      <h2>Schedules</h2>
       <form onSubmit={submitHandler}>
-        <label htmlFor="name">Schedule Name:</label>
+        <label htmlFor="name">Name:</label>
         <input
           type="text"
           placeholder="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           name="name" />
-        <label htmlFor="days">Days:</label>
+        <label htmlFor="days">Active days weekly:</label>
         <input
           type="number"
           placeholder="0"
@@ -90,13 +90,13 @@ const CreateSchedule = () => {
         </button>
       </form>
       {schedules.map((schedule) => (
-        <div>
-          <li key="schedule-name">Schedule name: {schedule.name}</li>
-          <li key="numOfDays">Number of days: {schedule.days}</li>
-          <li key="beforeBreak">Number of periods before break: {schedule.beforeBreak}</li>
-          <li key="afterBreak">Number of periods after break: {schedule.afterBreak}</li>
-          <Link to={`/generate/${schedule._id}`} state={{ schedule }}>Generate schedule</Link>
-          <Link to={`/schedule/${schedule._id}`} state={{ schedule }}>Manage subjects</Link>
+        <div className="container">
+          <li key="schedule-name"><b>Schedule name:</b> <span className="value">{schedule.name}</span></li>
+          <li key="numOfDays"><b>Number of days:</b> <span className="value">{schedule.days}</span></li>
+          <li key="beforeBreak"><b>Number of periods before break:</b> <span className="value">{schedule.beforeBreak}</span></li>
+          <li key="afterBreak"><b>Number of periods after break:</b> <span className="value">{schedule.afterBreak}</span></li>
+          <Link to={`/generate/${schedule._id}`} state={{ schedule }}>Generate schedule</Link>{'  '}
+          <Link to={`/schedule/${schedule._id}`} state={{ schedule }}>Manage subjects</Link>{'  '}
           <button onClick={(e) => deleteHandler(e, schedule._id)}>Delete schedule</button>
         </div>
       ))}

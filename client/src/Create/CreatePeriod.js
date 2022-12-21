@@ -66,7 +66,7 @@ const CreatePeriod = () => {
   return (
     <div className="period">
       {refresh}
-      <h1>CreatePeriod</h1>
+      <h2>CreatePeriod</h2>
 
       {
         location.state.schedule ? (<div>
