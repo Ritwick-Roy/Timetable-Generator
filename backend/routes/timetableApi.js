@@ -55,7 +55,6 @@ router.get("/:scheduleId", async (req, res) => {
             }
         })
             .then((result) => {
-                // console.log(result.data);
                 res.json(result.data);
             })
     } catch (error) {

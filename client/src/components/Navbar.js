@@ -16,7 +16,7 @@ const Navbar = () => {
       <Link to="/">
         <h1>TimeTable Generator</h1>
       </Link>
-      <div className="links">
+      {/* <div className="links">
         <Link
           className="predict-link"
           to="/schedule"
@@ -29,10 +29,10 @@ const Navbar = () => {
           onMouseLeave={handleMouseLeave}
         >
           Schedules
-        </Link>
+        </Link> */}
         {/* <Link to="/schedule">Schedules</Link> */}
-        <Link to="/about">About</Link>
-      </div>
+        {/* <Link to="/about">About</Link>
+      </div> */}
     </nav>
   );
 };

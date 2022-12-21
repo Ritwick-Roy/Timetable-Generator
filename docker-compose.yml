@@ -3,13 +3,10 @@ services:
   api:
     build: ./backend
     container_name: apic
-    # ports:
-    #   - '5000:5000'
     network_mode: host
     volumes:
       - ./backend:/app
       - ./app/node_modules
-    command: npm run start
   client:
     build: ./client
     container_name: clientc
