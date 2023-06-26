@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 dotenv.config({path:__dirname+'/../.env'});
 
+import router from './router';
 
 const SERVER_PORT: string | undefined = process.env.SERVER_PORT;
 const MONGO_URI: string | undefined = process.env.MONGO_URI;
@@ -40,3 +41,4 @@ server.listen(SERVER_PORT,()=>(
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URI);
 mongoose.connection.on('error',(error:Error) => console.log(error));
+app.use('/',router());
