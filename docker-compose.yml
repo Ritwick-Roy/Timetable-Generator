@@ -5,8 +5,8 @@ services:
     container_name: apic
     network_mode: host
     volumes:
-      - ./backend:/app
-      - ./app/node_modules
+      - ./tsbackend:/app
+      # - ./app/node_modules
   client:
     build: ./client
     container_name: clientc
