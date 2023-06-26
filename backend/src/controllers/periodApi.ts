@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import mongoose from "mongoose";
 import Period from "../models/Period";
 import Subject from "../models/Subject";
 import { IPeriod } from "../types/Period";
